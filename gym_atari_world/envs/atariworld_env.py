@@ -140,7 +140,7 @@ class AtariEnv(gym.Env, utils.EzPickle):
             num_steps = self.np_random.randint(self.frameskip[0], self.frameskip[1])
         for _ in range(num_steps):
             reward += self.ale.act(action)
-        ob = self._get_obs()/self.color
+        ob = self._get_obs()
 
 
 
@@ -161,21 +161,21 @@ class AtariEnv(gym.Env, utils.EzPickle):
         if self._obs_type == 'ram':
             return self._get_ram()
         elif self._obs_type == 'image':
-            img = self._get_image()
+            img = self._get_image()/self.color
             (h, w, c) = img.shape
 
             if self.noise:
-                gaussian = np.random.normal(0,1,(h,w,c))
+                gaussian = np.random.normal(0, 0, (h, w, c))
                 img = img + gaussian
 
             h_s = int(h // self.size)
             w_s = int(w // self.size)
 
-            if (h_s + w_s) * self.size != h*w:
-                raise error.Error('Illegal resize parameter.')
+            #if (h_s + w_s) * self.size != h*w:
+            #    raise error.Error('Illegal resize parameter.')
 
             img = img.reshape(h_s, self.size,
-                               w_s, self.size, 3).max(3).max(1) # downsampling
+                              w_s, self.size, 3).max(3).max(1) # downsampling
 
             if self.orientation == False:
                 img = img.transpose(1,0,2) # Change the orientation
@@ -184,17 +184,36 @@ class AtariEnv(gym.Env, utils.EzPickle):
     # return: (states, observations)
     def reset(self):
         self.ale.reset_game()
-        return self._get_obs()/self.color
+        return self._get_obs()
 
     def render(self, mode='human'):
         img = self._get_image()
+
+        # To show the effects of changing factors
+        (h, w, c) = img.shape
+        if self.noise:
+            gaussian = np.random.normal(0, 0, (h, w, c))
+            img = img + gaussian
+
+        h_s = int(h // self.size)
+        w_s = int(w // self.size)
+
+        # if (h_s + w_s) * self.size != h*w:
+        #    raise error.Error('Illegal resize parameter.')
+
+        img = img.reshape(h_s, self.size,
+                          w_s, self.size, 3).max(3).max(1)
+
+        if self.orientation == False:
+            img = img.transpose(1, 0, 2)
+
         if mode == 'rgb_array':
             return img
         elif mode == 'human':
             from gym.envs.classic_control import rendering
             if self.viewer is None:
                 self.viewer = rendering.SimpleImageViewer()
-            #self.viewer.imshow(img)
+            self.viewer.imshow(img)
             return self.viewer.isopen
 
     def close(self):
