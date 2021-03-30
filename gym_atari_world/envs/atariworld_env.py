@@ -25,7 +25,7 @@ class AtariEnv(gym.Env, utils.EzPickle):
 
     def __init__(
             self,
-            game='pong',
+            game='Pong',
             mode=None,
             difficulty=None,
             obs_type='image',
@@ -161,12 +161,19 @@ class AtariEnv(gym.Env, utils.EzPickle):
         if self._obs_type == 'ram':
             return self._get_ram()
         elif self._obs_type == 'image':
-            img = self._get_image()/self.color
+            img = self._get_image()
+
             (h, w, c) = img.shape
 
             if self.noise:
-                gaussian = np.random.normal(0, 0, (h, w, c))
+                img = img / 255
+                gaussian = np.random.normal(0, 0.1, (h, w))
+                gaussian = gaussian[:, :, None] * np.ones(3, dtype=int)[None, None, :]
                 img = img + gaussian
+                # img = np.clip(img, 0, 1)
+                img = np.uint8(img * 255)
+
+            img = np.uint8(img / self.color)
 
             h_s = int(h // self.size)
             w_s = int(w // self.size)
@@ -188,12 +195,18 @@ class AtariEnv(gym.Env, utils.EzPickle):
 
     def render(self, mode='human'):
         img = self._get_image()
-
         # To show the effects of changing factors
         (h, w, c) = img.shape
+
         if self.noise:
-            gaussian = np.random.normal(0, 0, (h, w, c))
+            img = img / 255
+            gaussian = np.random.normal(0, 0.1, (h, w))
+            gaussian = gaussian[:, :, None] * np.ones(3, dtype=int)[None, None, :]
             img = img + gaussian
+            #img = np.clip(img, 0, 1)
+            img = np.uint8(img * 255)
+
+        img = np.uint8(img / self.color)
 
         h_s = int(h // self.size)
         w_s = int(w // self.size)

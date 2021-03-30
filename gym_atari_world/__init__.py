@@ -3,16 +3,21 @@ from gym.envs.registration import register, registry, make, spec
 
 logger = logging.getLogger(__name__)
 
-register(
-    id='atariWorld-v0000',
-    entry_point='gym_atari_world.envs:AtariEnv',
-    kwargs={'color': 1},
-)
-
+'''
+Changing factors: v_{color}_{size}_{orientation}_{noise}
+0: No change, set to default
+1: Change
+'''
 register(
     id='atariWorld-v1000',
     entry_point='gym_atari_world.envs:AtariEnv',
-    kwargs={'color': 255},
+    kwargs={'color': 5},
+)
+
+register(
+    id='atariWorld-v0100',
+    entry_point='gym_atari_world.envs:AtariEnv',
+    kwargs={'color': 2},
 )
 
 register(
@@ -27,10 +32,5 @@ register(
     kwargs={'noise': True},
 )
 
-register(
-    id='atariWorld-v0100',
-    entry_point='gym_atari_world.envs:AtariEnv',
-    kwargs={'size': 10},
-)
 
 
