@@ -35,7 +35,7 @@ class AtariEnv(gym.Env, utils.EzPickle):
             orientation=True,
             color=1,
             size=1,
-            noise=1):
+            noise=False):
         """Frameskip should be either a tuple (indicating a random range to
         choose from, with the top value exclude), or an int."""
 
@@ -163,6 +163,11 @@ class AtariEnv(gym.Env, utils.EzPickle):
         elif self._obs_type == 'image':
             img = self._get_image()
             (h, w, c) = img.shape
+
+            if self.noise:
+                gaussian = np.random.normal(0,1,(h,w,c))
+                img = img + gaussian
+
             h_s = int(h // self.size)
             w_s = int(w // self.size)
 
@@ -171,6 +176,7 @@ class AtariEnv(gym.Env, utils.EzPickle):
 
             img = img.reshape(h_s, self.size,
                                w_s, self.size, 3).max(3).max(1) # downsampling
+
             if self.orientation == False:
                 img = img.transpose(1,0,2) # Change the orientation
         return img
