@@ -200,7 +200,7 @@ class AtariEnv(gym.Env, utils.EzPickle):
 
         if self.noise:
             img = img / 255
-            gaussian = np.random.normal(0, 0.1, (h, w))
+            gaussian = np.random.normal(0, 0.2, (h, w))
             gaussian = gaussian[:, :, None] * np.ones(3, dtype=int)[None, None, :]
             img = img + gaussian
             #img = np.clip(img, 0, 1)

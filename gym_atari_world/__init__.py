@@ -11,7 +11,7 @@ Changing factors: v_{color}_{size}_{orientation}_{noise}
 register(
     id='atariWorld-v1000',
     entry_point='gym_atari_world.envs:AtariEnv',
-    kwargs={'color': 5},
+    kwargs={'color': 0.5},
 )
 
 register(
